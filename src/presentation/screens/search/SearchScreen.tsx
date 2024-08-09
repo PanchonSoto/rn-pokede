@@ -10,6 +10,7 @@ import { PokemonCard } from '../../components/pokemons/PokemonCard';
 import { ThemeContext } from '../../context/ThemeContext';
 import { getPokemonNamesWithId, getPokemonsByIds } from '../../../actions/pokemons';
 import { FullScreenLoader } from '../../components/ui/FullScreenLoader';
+import { useDebounceValue } from '../../hooks/useDebouncedValue';
 
 
 export const SearchScreen = () => {
@@ -17,6 +18,7 @@ export const SearchScreen = () => {
   const { top } = useSafeAreaInsets();
   const { isDark } = useContext(ThemeContext);
   const [term, setTerm] = useState('');
+  const debounceValue = useDebounceValue(term);
 
   const {isLoading, data: pokemonNameList=[]} = useQuery({
     queryKey: ['pokemons', 'all'],
@@ -25,19 +27,19 @@ export const SearchScreen = () => {
 
   const pokemonNameIdList = useMemo(()=>{
     //is a number
-    if( !isNaN(Number(term)) ) {
-      const pokemon = pokemonNameList?.find(pokemon=>pokemon.id===Number(term));
+    if( !isNaN(Number(debounceValue)) ) {
+      const pokemon = pokemonNameList?.find(pokemon=>pokemon.id===Number(debounceValue));
       return pokemon ? [pokemon]: [];
     }
 
-    if(term.length===0) return [];
-    if(term.length<3) return [];
+    if(debounceValue.length===0) return [];
+    if(debounceValue.length<3) return [];
 
     return pokemonNameList.filter(pokemon=>
-      pokemon.name.includes(term.toLocaleLowerCase()),
+      pokemon.name.includes(debounceValue.toLocaleLowerCase()),
     );
 
-  },[term]);
+  },[debounceValue]);
 
   const {isLoading:isLoadingPokemons, data:pokemons} = useQuery({
     queryKey: ['pokemons','by', pokemonNameIdList],
@@ -74,6 +76,7 @@ export const SearchScreen = () => {
         <PokemonCard pokemon={item}/>
        )}
        showsVerticalScrollIndicator={false}
+       ListFooterComponent={<View style={{height:150}}/>}
       />
     </View>
   );
