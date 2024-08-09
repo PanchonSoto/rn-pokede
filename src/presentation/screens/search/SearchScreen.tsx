@@ -1,10 +1,10 @@
 import { View, Text } from 'react-native';
 
 
-export const Screen1 = () => {
+export const SearchScreen = () => {
   return (
     <View>
-      <Text>Screen1</Text>
+      <Text>SearchScreen</Text>
     </View>
   );
 }
