@@ -2,7 +2,7 @@ import { StyleSheet, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 
 import { getPokemons } from '../../../actions/pokemons';
 import { PokeballBg } from '../../components/ui/PokeballBg';
@@ -15,6 +15,7 @@ import { globalTheme } from '../../../config/theme/global-theme';
 export const HomeScreen = () => {
 
   const {top} = useSafeAreaInsets();
+  const queryClient = useQueryClient();
 
   //!Traditional way to request http
   /*   const { isLoading, data:pokemons=[]} = useQuery({
@@ -25,9 +26,16 @@ export const HomeScreen = () => {
   const { isLoading, data, fetchNextPage} = useInfiniteQuery({
     queryKey: ['pokemon', 'infinite'],
     initialPageParam: 0,
-    queryFn: (params)=>getPokemons(params.pageParam),
+    staleTime:1000*60*60,//60minutes
+    queryFn: async params => {
+      const pokemons = await getPokemons(params.pageParam);
+      pokemons.forEach(pokemon=>{
+        queryClient.setQueryData(['pokemon',pokemon.id], pokemon);
+      });
+      return pokemons;
+    },
     getNextPageParam: (lastPage, pages)=> pages.length,
-    staleTime:1000*60*60//60minutes
+
   })
 
   // console.log(JSON.stringify(data?.pages[0]));
