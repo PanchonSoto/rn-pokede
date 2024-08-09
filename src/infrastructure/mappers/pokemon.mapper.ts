@@ -32,12 +32,8 @@ export class PokemonMapper {
 
 
   static getSprites(data: PokeApiPokemon): string[] {
-    const sprites: string[] = [
-      data.sprites.front_default,
-      data.sprites.back_default,
-      data.sprites.front_shiny,
-      data.sprites.back_shiny,
-    ];
+
+    const sprites: string[] = [];
 
     if (data.sprites.other?.home.front_default)
       sprites.push(data.sprites.other?.home.front_default);
