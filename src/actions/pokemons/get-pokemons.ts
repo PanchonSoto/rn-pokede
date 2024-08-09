@@ -16,18 +16,18 @@ export const getPokemons = async(page:number, limit:number=20):Promise<Pokemon[]
         const {data} = await pokeApi.get<PokeAPIPaginatedResponse>(url);
 
         //?get data.url and iterate it to get promesis of each pokemons
-        const pokemonsPromises = data.results.map((info)=>{
+        const pokemonPromises = data.results.map((info)=>{
             return pokeApi.get<PokeApiPokemon>(info.url);
         });
 
         //?resolve all promises of all pokemons with promise.all
-        const pokeApiPokemons = await Promise.all(pokemonsPromises);
+        const pokeApiPokemons = await Promise.all(pokemonPromises);
 
         //?mapper data with custom mapper
-        const pokemons = pokeApiPokemons.map((item)=>PokemonMapper.pokeApiPokemonToEntity(item.data));
+        const pokemonsPromises = pokeApiPokemons.map((item)=>PokemonMapper.pokeApiPokemonToEntity(item.data));
 
         //?return new object of pokemon (id,name,avatar,sprites,types)
-        return pokemons;
+        return await Promise.all(pokemonsPromises);
 
     } catch (error) {
         console.log(error);
