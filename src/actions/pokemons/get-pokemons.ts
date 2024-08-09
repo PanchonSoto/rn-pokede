@@ -10,7 +10,7 @@ import { PokemonMapper } from "../../infrastructure/mappers/pokemon.mapper";
 export const getPokemons = async(page:number, limit:number=20):Promise<Pokemon[]> => {
     try {
 
-        const url = `/pokemon?offset=${page*10}&limit=${limit}`;
+        const url = `/pokemon?offset=${page*20}&limit=${limit}`;
 
         //?data los like: "results": [{ "name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"},{...}]
         const {data} = await pokeApi.get<PokeAPIPaginatedResponse>(url);
